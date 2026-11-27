@@ -1,71 +1,71 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="robots" content="noindex">
-<title>新聞部 管理ページ｜号外ボード</title>
-<style>
-:root{--bg:#dce4ea;--ink:#14213d;--slip:#fff;--hl:#ffe45c;--red:#d62839;--muted:#4a5568}
-@media (prefers-color-scheme:dark){:root{--bg:#1b2433;--ink:#eef2f6;--slip:#26334a;--muted:#aab6c6}}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:"Zen Kaku Gothic New",sans-serif;line-height:1.7}
-.wrap{max-width:760px;margin:0 auto;padding:24px 16px 64px}
-h1{font-size:1.6rem;margin:0 0 4px}
-.lead{color:var(--muted);margin:0 0 20px}
-input,button{font:inherit}
-#pw{padding:8px;border:2px solid var(--ink);background:transparent;color:var(--ink);border-radius:4px;width:240px;max-width:100%}
-.login{padding:8px 18px;border:0;background:var(--ink);color:var(--bg);border-radius:4px;cursor:pointer;margin-left:6px}
-button:focus-visible,input:focus-visible{outline:3px solid var(--red);outline-offset:2px}
-.item{background:var(--slip);padding:14px 16px;margin-top:14px;box-shadow:3px 4px 0 rgba(20,33,61,.25)}
-.item.off{opacity:.55}
-.item h2{font-size:1.05rem;margin:0}
-.item p{margin:2px 0 8px}
-.small{font-size:.85rem;color:var(--muted)}
-.ctl{display:flex;flex-wrap:wrap;gap:16px}
-.ctl label{cursor:pointer}
-#msg{font-weight:700;margin-top:10px}
-</style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex">
+    <title>新聞部 管理ページ｜号外ボード</title>
+    <style>
+    :root{--bg:#dce4ea;--ink:#14213d;--slip:#fff;--hl:#ffe45c;--red:#d62839;--muted:#4a5568}
+    @media (prefers-color-scheme:dark){:root{--bg:#1b2433;--ink:#eef2f6;--slip:#26334a;--muted:#aab6c6}}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);font-family:"Zen Kaku Gothic New",sans-serif;line-height:1.7}
+    .wrap{max-width:760px;margin:0 auto;padding:24px 16px 64px}
+    h1{font-size:1.6rem;margin:0 0 4px}
+    .lead{color:var(--muted);margin:0 0 20px}
+    input,button{font:inherit}
+    #pw{padding:8px;border:2px solid var(--ink);background:transparent;color:var(--ink);border-radius:4px;width:240px;max-width:100%}
+    .login{padding:8px 18px;border:0;background:var(--ink);color:var(--bg);border-radius:4px;cursor:pointer;margin-left:6px}
+    button:focus-visible,input:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+    .item{background:var(--slip);padding:14px 16px;margin-top:14px;box-shadow:3px 4px 0 rgba(20,33,61,.25)}
+    .item.off{opacity:.55}
+    .item h2{font-size:1.05rem;margin:0}
+    .item p{margin:2px 0 8px}
+    .small{font-size:.85rem;color:var(--muted)}
+    .ctl{display:flex;flex-wrap:wrap;gap:16px}
+    .ctl label{cursor:pointer}
+    #msg{font-weight:700;margin-top:10px}
+    </style>
 </head>
 <body>
-<div class="wrap">
-  <h1>新聞部 管理ページ</h1>
-  <p class="lead">投稿に「確認済み」「号外」を付けたり、投稿を非表示にしたりできます。</p>
-  <label for="pw">管理パスワード</label><br>
-  <input id="pw" type="password" autocomplete="current-password">
-  <button class="login" id="login">ログイン</button>
-  <p id="msg" role="status"></p>
-  <div id="list"></div>
-</div>
-<script>
-let pass="";
-const esc=s=>s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const msg=document.getElementById("msg");
-async function load(){
-  const res=await fetch("/api/admin/posts",{headers:{"X-Admin-Password":pass}});
-  if(!res.ok){msg.textContent=res.status===401?"パスワードが違います（またはサーバーに未設定です）。":"読み込みに失敗しました。";return;}
-  msg.textContent="";
-  const posts=await res.json();
-  document.getElementById("list").innerHTML=posts.length?posts.map(p=>`
-   <div class="item${p.hidden?" off":""}" data-id="${p.id}">
-     <h2>${esc(p.t)}</h2><p>${esc(p.b)}</p>
-     <div class="small">${esc(p.c)}／${esc(p.n)}／読んだ ${p.r}</div>
-     <div class="ctl">
-       <label><input type="checkbox" data-k="verified" ${p.ok?"checked":""}> 確認済み</label>
-       <label><input type="checkbox" data-k="extra" ${p.extra?"checked":""}> 号外</label>
-       <label><input type="checkbox" data-k="hidden" ${p.hidden?"checked":""}> 非表示</label>
-     </div>
-   </div>`).join(""):"<p>投稿はまだありません。</p>";
-}
-document.getElementById("login").addEventListener("click",()=>{pass=document.getElementById("pw").value;load();});
-document.getElementById("list").addEventListener("change",async e=>{
-  const cb=e.target.closest("input[data-k]");if(!cb)return;
-  const item=cb.closest(".item");
-  const res=await fetch("/api/admin/posts/"+item.dataset.id,{method:"POST",headers:{"Content-Type":"application/json","X-Admin-Password":pass},body:JSON.stringify({[cb.dataset.k]:cb.checked})});
-  if(!res.ok){msg.textContent="保存に失敗しました。";cb.checked=!cb.checked;return;}
-  msg.textContent="保存しました。";
-  if(cb.dataset.k==="hidden")item.classList.toggle("off",cb.checked);
-});
-</script>
+    <div class="wrap">
+        <h1>新聞部 管理ページ</h1>
+        <p class="lead">投稿に「確認済み」「号外」を付けたり、投稿を非表示にしたりできます。</p>
+        <label for="pw">管理パスワード</label><br>
+        <input id="pw" type="password" autocomplete="current-password">
+        <button class="login" id="login">ログイン</button>
+        <p id="msg" role="status"></p>
+        <div id="list"></div>
+    </div>
+    <script>
+        let pass="";
+        const esc=s=>s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+        const msg=document.getElementById("msg");
+        async function load(){
+        const res=await fetch("/api/admin/posts",{headers:{"X-Admin-Password":pass}});
+        if(!res.ok){msg.textContent=res.status===401?"パスワードが違います（またはサーバーに未設定です）。":"読み込みに失敗しました。";return;}
+        msg.textContent="";
+        const posts=await res.json();
+        document.getElementById("list").innerHTML=posts.length?posts.map(p=>`
+        <div class="item${p.hidden?" off":""}" data-id="${p.id}">
+            <h2>${esc(p.t)}</h2><p>${esc(p.b)}</p>
+            <div class="small">${esc(p.c)}／${esc(p.n)}／読んだ ${p.r}</div>
+            <div class="ctl">
+            <label><input type="checkbox" data-k="verified" ${p.ok?"checked":""}> 確認済み</label>
+            <label><input type="checkbox" data-k="extra" ${p.extra?"checked":""}> 号外</label>
+            <label><input type="checkbox" data-k="hidden" ${p.hidden?"checked":""}> 非表示</label>
+            </div>
+        </div>`).join(""):"<p>投稿はまだありません。</p>";
+        }
+        document.getElementById("login").addEventListener("click",()=>{pass=document.getElementById("pw").value;load();});
+        document.getElementById("list").addEventListener("change",async e=>{
+        const cb=e.target.closest("input[data-k]");if(!cb)return;
+        const item=cb.closest(".item");
+        const res=await fetch("/api/admin/posts/"+item.dataset.id,{method:"POST",headers:{"Content-Type":"application/json","X-Admin-Password":pass},body:JSON.stringify({[cb.dataset.k]:cb.checked})});
+        if(!res.ok){msg.textContent="保存に失敗しました。";cb.checked=!cb.checked;return;}
+        msg.textContent="保存しました。";
+        if(cb.dataset.k==="hidden")item.classList.toggle("off",cb.checked);
+        });
+    </script>
 </body>
 </html>

@@ -46,86 +46,86 @@
 </head>
 <body>
     <div class="wrap">
-    <h1><mark>号外</mark>ボード</h1>
-    <p class="lead">新聞部がまとめる、校内ニュースの掲示板。部活の結果も、落とし物も、短いニュースにして貼ろう。「確認済み」は新聞部が事実を確かめた印です。</p>
+        <h1><mark>号外</mark>ボード</h1>
+        <p class="lead">新聞部がまとめる、校内ニュースの掲示板。部活の結果も、落とし物も、短いニュースにして貼ろう。「確認済み」は新聞部が事実を確かめた印です。</p>
 
-    <div class="filters" id="filters" role="group" aria-label="カテゴリで絞り込む"></div>
-    <div class="tools"><input id="q" type="search" placeholder="キーワードで探す" aria-label="キーワードで探す"><select id="sort" aria-label="並び替え"><option value="new">新着順</option><option value="read">読んだ数順</option></select></div>
-    <main class="board" id="board" aria-live="polite"></main>
+        <div class="filters" id="filters" role="group" aria-label="カテゴリで絞り込む"></div>
+        <div class="tools"><input id="q" type="search" placeholder="キーワードで探す" aria-label="キーワードで探す"><select id="sort" aria-label="並び替え"><option value="new">新着順</option><option value="read">読んだ数順</option></select></div>
+        <main class="board" id="board" aria-live="polite"></main>
 
-    <form id="post">
-        <h2>ニュースを投稿する</h2>
-        <label for="title">見出し</label>
-        <input id="title" required maxlength="30" placeholder="例：サッカー部、県大会ベスト8進出">
-        <label for="body">ひとこと</label>
-        <textarea id="body" rows="3" required maxlength="100" placeholder="いつ・どこで・なにがあった？（100字まで）"></textarea>
-        <label for="cat">カテゴリ</label>
-        <select id="cat"><option>部活</option><option>行事</option><option>落とし物</option><option>相談</option></select>
-        <label for="nick">ニックネーム</label>
-        <input id="nick" required maxlength="12" placeholder="本名は書かない">
-        <button class="submit" type="submit">投稿する</button>
-        <p class="note">個人名・電話番号などは書かないでください。新聞部が内容を確認します。</p>
-        <p id="msg" role="status"></p>
-    </form>
+        <form id="post">
+            <h2>ニュースを投稿する</h2>
+            <label for="title">見出し</label>
+            <input id="title" required maxlength="30" placeholder="例：サッカー部、県大会ベスト8進出">
+            <label for="body">ひとこと</label>
+            <textarea id="body" rows="3" required maxlength="100" placeholder="いつ・どこで・なにがあった？（100字まで）"></textarea>
+            <label for="cat">カテゴリ</label>
+            <select id="cat"><option>部活</option><option>行事</option><option>落とし物</option><option>相談</option></select>
+            <label for="nick">ニックネーム</label>
+            <input id="nick" required maxlength="12" placeholder="本名は書かない">
+            <button class="submit" type="submit">投稿する</button>
+            <p class="note">個人名・電話番号などは書かないでください。新聞部が内容を確認します。</p>
+            <p id="msg" role="status"></p>
+        </form>
     </div>
 
     <script>
-    const cats=["すべて","部活","行事","落とし物","相談"];
-    let posts=[];
-    async function loadPosts(){
-    try{ const res=await fetch("/api/posts"); posts=await res.json(); }catch(err){ posts=[]; }
-    render();
-    }
-    let current="すべて";
-    const esc=s=>s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-    function render(){
-    const kw=document.getElementById("q").value.trim().toLowerCase();
-    const by=document.getElementById("sort").value;
-    const list=posts
-        .filter(p=>(current==="すべて"||p.c===current)&&(!kw||(p.t+" "+p.b+" "+p.n).toLowerCase().includes(kw)))
-        .sort((a,b)=>(b.extra?1:0)-(a.extra?1:0)||(by==="read"?b.r-a.r:(b.created||"").localeCompare(a.created||"")));
-    document.getElementById("board").innerHTML=list.length?list.map((p,i)=>`
-    <article class="slip${p.extra?" extra":""}">
-        ${p.ok?'<span class="stamp">確認済み</span>':''}
-        <span class="tag">${p.extra?"号外・":""}${esc(p.c)}</span>
-        <h2>${esc(p.t)}</h2><p>${esc(p.b)}</p>
-        <div class="meta"><span>${esc(p.n)}</span>
-        <button class="read" aria-pressed="false" data-i="${posts.indexOf(p)}">読んだ ${p.r}</button></div>
-    </article>`).join(""):"<p>該当するニュースがありません。条件を変えるか、最初の1本を投稿しよう。</p>";
-    }
-    document.getElementById("filters").innerHTML=cats.map(c=>`<button aria-pressed="${c===current}">${c}</button>`).join("");
-    document.getElementById("filters").addEventListener("click",e=>{
-    if(e.target.tagName!=="BUTTON")return;
-    current=e.target.textContent;
-    [...e.currentTarget.children].forEach(b=>b.setAttribute("aria-pressed",b.textContent===current));
-    render();
-    });
-    document.getElementById("board").addEventListener("click",async e=>{
-    const b=e.target.closest(".read");if(!b)return;
-    const p=posts[b.dataset.i],on=b.getAttribute("aria-pressed")==="true";
-    try{
-        const res=await fetch("/api/posts/"+p.id+"/read",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({delta:on?-1:1})});
-        if(!res.ok)return;
-        p.r=(await res.json()).r;
-    }catch(err){return;}
-    b.setAttribute("aria-pressed",String(!on));b.textContent="読んだ "+p.r;
-    });
-    document.getElementById("post").addEventListener("submit",async e=>{
-    e.preventDefault();
-    const msg=document.getElementById("msg");
-    try{
-        const res=await fetch("/api/posts",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({t:title.value,b:body.value,c:cat.value,n:nick.value})});
-        if(!res.ok)throw new Error();
-        posts.unshift(await res.json());
-    }catch(err){msg.textContent="投稿に失敗しました。もう一度お試しください。";return;}
-    e.target.reset();current="すべて";
-    [...document.getElementById("filters").children].forEach(b=>b.setAttribute("aria-pressed",b.textContent==="すべて"));
-    render();
-    document.getElementById("msg").textContent="投稿しました。新聞部が確認すると「確認済み」が付きます。";
-    });
-    document.getElementById("q").addEventListener("input",render);
-    document.getElementById("sort").addEventListener("change",render);
-    loadPosts();
+        const cats=["すべて","部活","行事","落とし物","相談"];
+        let posts=[];
+        async function loadPosts(){
+        try{ const res=await fetch("/api/posts"); posts=await res.json(); }catch(err){ posts=[]; }
+        render();
+        }
+        let current="すべて";
+        const esc=s=>s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+        function render(){
+        const kw=document.getElementById("q").value.trim().toLowerCase();
+        const by=document.getElementById("sort").value;
+        const list=posts
+            .filter(p=>(current==="すべて"||p.c===current)&&(!kw||(p.t+" "+p.b+" "+p.n).toLowerCase().includes(kw)))
+            .sort((a,b)=>(b.extra?1:0)-(a.extra?1:0)||(by==="read"?b.r-a.r:(b.created||"").localeCompare(a.created||"")));
+        document.getElementById("board").innerHTML=list.length?list.map((p,i)=>`
+        <article class="slip${p.extra?" extra":""}">
+            ${p.ok?'<span class="stamp">確認済み</span>':''}
+            <span class="tag">${p.extra?"号外・":""}${esc(p.c)}</span>
+            <h2>${esc(p.t)}</h2><p>${esc(p.b)}</p>
+            <div class="meta"><span>${esc(p.n)}</span>
+            <button class="read" aria-pressed="false" data-i="${posts.indexOf(p)}">読んだ ${p.r}</button></div>
+        </article>`).join(""):"<p>該当するニュースがありません。条件を変えるか、最初の1本を投稿しよう。</p>";
+        }
+        document.getElementById("filters").innerHTML=cats.map(c=>`<button aria-pressed="${c===current}">${c}</button>`).join("");
+        document.getElementById("filters").addEventListener("click",e=>{
+        if(e.target.tagName!=="BUTTON")return;
+        current=e.target.textContent;
+        [...e.currentTarget.children].forEach(b=>b.setAttribute("aria-pressed",b.textContent===current));
+        render();
+        });
+        document.getElementById("board").addEventListener("click",async e=>{
+        const b=e.target.closest(".read");if(!b)return;
+        const p=posts[b.dataset.i],on=b.getAttribute("aria-pressed")==="true";
+        try{
+            const res=await fetch("/api/posts/"+p.id+"/read",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({delta:on?-1:1})});
+            if(!res.ok)return;
+            p.r=(await res.json()).r;
+        }catch(err){return;}
+        b.setAttribute("aria-pressed",String(!on));b.textContent="読んだ "+p.r;
+        });
+        document.getElementById("post").addEventListener("submit",async e=>{
+        e.preventDefault();
+        const msg=document.getElementById("msg");
+        try{
+            const res=await fetch("/api/posts",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({t:title.value,b:body.value,c:cat.value,n:nick.value})});
+            if(!res.ok)throw new Error();
+            posts.unshift(await res.json());
+        }catch(err){msg.textContent="投稿に失敗しました。もう一度お試しください。";return;}
+        e.target.reset();current="すべて";
+        [...document.getElementById("filters").children].forEach(b=>b.setAttribute("aria-pressed",b.textContent==="すべて"));
+        render();
+        document.getElementById("msg").textContent="投稿しました。新聞部が確認すると「確認済み」が付きます。";
+        });
+        document.getElementById("q").addEventListener("input",render);
+        document.getElementById("sort").addEventListener("change",render);
+        loadPosts();
     </script>
 </body>
 </html>
