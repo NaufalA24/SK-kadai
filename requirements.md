@@ -80,4 +80,5 @@
 | 画像の投稿と表示 | 投稿に画像を付け、Blob Storageから表示する | 未実装（今後の予定） |
 
 サイトのURL：https://skkadai-b8bugxdqgnhgd3fe.eastasia-01.azurewebsites.net/
+アドミンパスワード：admin123456
 GitHubリポジトリのURL：https://github.com/NaufalA24/SK-kadai
