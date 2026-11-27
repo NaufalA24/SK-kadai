@@ -1,121 +1,131 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>号外ボード｜新聞部の校内ニュース掲示板</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@400;700&display=swap" rel="stylesheet">
-<style>
-:root{--bg:#dce4ea;--ink:#14213d;--slip:#fff;--hl:#ffe45c;--red:#d62839;--muted:#4a5568}
-@media (prefers-color-scheme:dark){:root{--bg:#1b2433;--ink:#eef2f6;--slip:#26334a;--muted:#aab6c6}}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:"Zen Kaku Gothic New",sans-serif;line-height:1.7}
-.wrap{max-width:960px;margin:0 auto;padding:24px 16px 64px}
-h1{font-family:"Dela Gothic One",sans-serif;font-weight:400;font-size:clamp(40px,10vw,84px);line-height:1.1;margin:8px 0 4px}
-h1 mark{background:var(--hl);color:#14213d;padding:0 .15em}
-.lead{max-width:34em;color:var(--muted);margin:0 0 20px}
-.filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px}
-.filters button{font:inherit;border:2px solid var(--ink);background:transparent;color:var(--ink);padding:6px 14px;border-radius:999px;cursor:pointer}
-.filters button[aria-pressed=true]{background:var(--ink);color:var(--bg)}
-button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--red);outline-offset:2px}
-.board{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:22px}
-.slip{position:relative;background:var(--slip);padding:22px 18px 14px;box-shadow:3px 4px 0 rgba(20,33,61,.25)}
-.slip:nth-child(3n+1){transform:rotate(-1.2deg)}.slip:nth-child(3n+2){transform:rotate(.8deg)}.slip:nth-child(3n){transform:rotate(-.4deg)}
-.slip::before{content:"";position:absolute;top:-10px;left:50%;width:70px;height:20px;margin-left:-35px;background:rgba(255,228,92,.8)}
-.slip.extra{grid-column:1/-1;border:3px solid var(--red);transform:none}
-.slip h2{font-size:1.15rem;margin:6px 0 4px;line-height:1.4}
-.slip.extra h2{font-family:"Dela Gothic One",sans-serif;font-weight:400;font-size:clamp(1.4rem,4vw,2.2rem)}
-.meta{font-size:.85rem;color:var(--muted);display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:10px}
-.tag{display:inline-block;font-size:.8rem;background:var(--hl);color:#14213d;padding:0 8px}
-.stamp{position:absolute;top:10px;right:10px;border:2px solid var(--red);color:var(--red);font-weight:700;font-size:.8rem;padding:0 6px;transform:rotate(8deg)}
-.read{font:inherit;font-size:.85rem;border:1px solid var(--muted);background:transparent;color:var(--ink);border-radius:6px;padding:2px 8px;cursor:pointer}
-.read[aria-pressed=true]{background:var(--ink);color:var(--bg)}
-form{margin-top:48px;background:var(--slip);padding:20px;max-width:560px;box-shadow:3px 4px 0 rgba(20,33,61,.25)}
-form h2{margin:0 0 12px;font-size:1.3rem}
-label{display:block;font-weight:700;margin-top:12px}
-input,select,textarea{width:100%;font:inherit;padding:8px;border:2px solid var(--ink);background:transparent;color:var(--ink);border-radius:4px}
-form .submit{margin-top:16px;font:inherit;font-weight:700;background:var(--red);color:#fff;border:0;padding:10px 20px;cursor:pointer;border-radius:4px}
-.note{font-size:.85rem;color:var(--muted);margin-top:8px}
-#msg{font-weight:700;margin-top:10px}
-@media (prefers-reduced-motion:no-preference){.slip{transition:transform .15s}.slip:hover{transform:rotate(0) translateY(-3px)}}
-</style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>号外ボード｜新聞部の校内ニュース掲示板</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root{--bg:#dce4ea;--ink:#14213d;--slip:#fff;--hl:#ffe45c;--red:#d62839;--muted:#4a5568}
+        @media (prefers-color-scheme:dark){:root{--bg:#1b2433;--ink:#eef2f6;--slip:#26334a;--muted:#aab6c6}}
+        *{box-sizing:border-box}
+        body{margin:0;background:var(--bg);color:var(--ink);font-family:"Zen Kaku Gothic New",sans-serif;line-height:1.7}
+        .wrap{max-width:960px;margin:0 auto;padding:24px 16px 64px}
+        h1{font-family:"Dela Gothic One",sans-serif;font-weight:400;font-size:clamp(40px,10vw,84px);line-height:1.1;margin:8px 0 4px}
+        h1 mark{background:var(--hl);color:#14213d;padding:0 .15em}
+        .lead{max-width:34em;color:var(--muted);margin:0 0 20px}
+        .filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+        .tools{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px}
+        .tools input{flex:1 1 200px;width:auto}
+        .tools select{width:auto}
+        .filters button{font:inherit;border:2px solid var(--ink);background:transparent;color:var(--ink);padding:6px 14px;border-radius:999px;cursor:pointer}
+        .filters button[aria-pressed=true]{background:var(--ink);color:var(--bg)}
+        button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+        .board{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:22px}
+        .slip{position:relative;background:var(--slip);padding:22px 18px 14px;box-shadow:3px 4px 0 rgba(20,33,61,.25)}
+        .slip:nth-child(3n+1){transform:rotate(-1.2deg)}.slip:nth-child(3n+2){transform:rotate(.8deg)}.slip:nth-child(3n){transform:rotate(-.4deg)}
+        .slip::before{content:"";position:absolute;top:-10px;left:50%;width:70px;height:20px;margin-left:-35px;background:rgba(255,228,92,.8)}
+        .slip.extra{grid-column:1/-1;border:3px solid var(--red);transform:none}
+        .slip h2{font-size:1.15rem;margin:6px 0 4px;line-height:1.4}
+        .slip.extra h2{font-family:"Dela Gothic One",sans-serif;font-weight:400;font-size:clamp(1.4rem,4vw,2.2rem)}
+        .meta{font-size:.85rem;color:var(--muted);display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:10px}
+        .tag{display:inline-block;font-size:.8rem;background:var(--hl);color:#14213d;padding:0 8px}
+        .stamp{position:absolute;top:10px;right:10px;border:2px solid var(--red);color:var(--red);font-weight:700;font-size:.8rem;padding:0 6px;transform:rotate(8deg)}
+        .read{font:inherit;font-size:.85rem;border:1px solid var(--muted);background:transparent;color:var(--ink);border-radius:6px;padding:2px 8px;cursor:pointer}
+        .read[aria-pressed=true]{background:var(--ink);color:var(--bg)}
+        form{margin-top:48px;background:var(--slip);padding:20px;max-width:560px;box-shadow:3px 4px 0 rgba(20,33,61,.25)}
+        form h2{margin:0 0 12px;font-size:1.3rem}
+        label{display:block;font-weight:700;margin-top:12px}
+        input,select,textarea{width:100%;font:inherit;padding:8px;border:2px solid var(--ink);background:transparent;color:var(--ink);border-radius:4px}
+        form .submit{margin-top:16px;font:inherit;font-weight:700;background:var(--red);color:#fff;border:0;padding:10px 20px;cursor:pointer;border-radius:4px}
+        .note{font-size:.85rem;color:var(--muted);margin-top:8px}
+        #msg{font-weight:700;margin-top:10px}
+        @media (prefers-reduced-motion:no-preference){.slip{transition:transform .15s}.slip:hover{transform:rotate(0) translateY(-3px)}}
+    </style>
 </head>
 <body>
-<div class="wrap">
-  <h1><mark>号外</mark>ボード</h1>
-  <p class="lead">新聞部がまとめる、校内ニュースの掲示板。部活の結果も、落とし物も、短いニュースにして貼ろう。「確認済み」は新聞部が事実を確かめた印です。</p>
+    <div class="wrap">
+    <h1><mark>号外</mark>ボード</h1>
+    <p class="lead">新聞部がまとめる、校内ニュースの掲示板。部活の結果も、落とし物も、短いニュースにして貼ろう。「確認済み」は新聞部が事実を確かめた印です。</p>
 
-  <div class="filters" id="filters" role="group" aria-label="カテゴリで絞り込む"></div>
-  <main class="board" id="board" aria-live="polite"></main>
+    <div class="filters" id="filters" role="group" aria-label="カテゴリで絞り込む"></div>
+    <div class="tools"><input id="q" type="search" placeholder="キーワードで探す" aria-label="キーワードで探す"><select id="sort" aria-label="並び替え"><option value="new">新着順</option><option value="read">読んだ数順</option></select></div>
+    <main class="board" id="board" aria-live="polite"></main>
 
-  <form id="post">
-    <h2>ニュースを投稿する</h2>
-    <label for="title">見出し</label>
-    <input id="title" required maxlength="30" placeholder="例：サッカー部、県大会ベスト8進出">
-    <label for="body">ひとこと</label>
-    <textarea id="body" rows="3" required maxlength="100" placeholder="いつ・どこで・なにがあった？（100字まで）"></textarea>
-    <label for="cat">カテゴリ</label>
-    <select id="cat"><option>部活</option><option>行事</option><option>落とし物</option><option>相談</option></select>
-    <label for="nick">ニックネーム</label>
-    <input id="nick" required maxlength="12" placeholder="本名は書かない">
-    <button class="submit" type="submit">投稿する</button>
-    <p class="note">個人名・電話番号などは書かないでください。新聞部が内容を確認します。</p>
-    <p id="msg" role="status"></p>
-  </form>
-</div>
+    <form id="post">
+        <h2>ニュースを投稿する</h2>
+        <label for="title">見出し</label>
+        <input id="title" required maxlength="30" placeholder="例：サッカー部、県大会ベスト8進出">
+        <label for="body">ひとこと</label>
+        <textarea id="body" rows="3" required maxlength="100" placeholder="いつ・どこで・なにがあった？（100字まで）"></textarea>
+        <label for="cat">カテゴリ</label>
+        <select id="cat"><option>部活</option><option>行事</option><option>落とし物</option><option>相談</option></select>
+        <label for="nick">ニックネーム</label>
+        <input id="nick" required maxlength="12" placeholder="本名は書かない">
+        <button class="submit" type="submit">投稿する</button>
+        <p class="note">個人名・電話番号などは書かないでください。新聞部が内容を確認します。</p>
+        <p id="msg" role="status"></p>
+    </form>
+    </div>
 
-<script>
-const cats=["すべて","部活","行事","落とし物","相談"];
-let posts=[];
-async function loadPosts(){
-  try{ const res=await fetch("/api/posts"); posts=await res.json(); }catch(err){ posts=[]; }
-  render();
-}
-let current="すべて";
-const esc=s=>s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-function render(){
-  const list=posts.filter(p=>current==="すべて"||p.c===current).sort((a,b)=>(b.extra?1:0)-(a.extra?1:0));
-  document.getElementById("board").innerHTML=list.length?list.map((p,i)=>`
-   <article class="slip${p.extra?" extra":""}">
-     ${p.ok?'<span class="stamp">確認済み</span>':''}
-     <span class="tag">${p.extra?"号外・":""}${esc(p.c)}</span>
-     <h2>${esc(p.t)}</h2><p>${esc(p.b)}</p>
-     <div class="meta"><span>${esc(p.n)}</span>
-     <button class="read" aria-pressed="false" data-i="${posts.indexOf(p)}">読んだ ${p.r}</button></div>
-   </article>`).join(""):"<p>このカテゴリのニュースはまだありません。最初の1本を投稿しよう。</p>";
-}
-document.getElementById("filters").innerHTML=cats.map(c=>`<button aria-pressed="${c===current}">${c}</button>`).join("");
-document.getElementById("filters").addEventListener("click",e=>{
-  if(e.target.tagName!=="BUTTON")return;
-  current=e.target.textContent;
-  [...e.currentTarget.children].forEach(b=>b.setAttribute("aria-pressed",b.textContent===current));
-  render();
-});
-document.getElementById("board").addEventListener("click",async e=>{
-  const b=e.target.closest(".read");if(!b)return;
-  const p=posts[b.dataset.i],on=b.getAttribute("aria-pressed")==="true";
-  try{
-    const res=await fetch("/api/posts/"+p.id+"/read",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({delta:on?-1:1})});
-    if(!res.ok)return;
-    p.r=(await res.json()).r;
-  }catch(err){return;}
-  b.setAttribute("aria-pressed",String(!on));b.textContent="読んだ "+p.r;
-});
-document.getElementById("post").addEventListener("submit",async e=>{
-  e.preventDefault();
-  const msg=document.getElementById("msg");
-  try{
-    const res=await fetch("/api/posts",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({t:title.value,b:body.value,c:cat.value,n:nick.value})});
-    if(!res.ok)throw new Error();
-    posts.unshift(await res.json());
-  }catch(err){msg.textContent="投稿に失敗しました。もう一度お試しください。";return;}
-  e.target.reset();current="すべて";
-  [...document.getElementById("filters").children].forEach(b=>b.setAttribute("aria-pressed",b.textContent==="すべて"));
-  render();
-  document.getElementById("msg").textContent="投稿しました。新聞部が確認すると「確認済み」が付きます。";
-});
-loadPosts();
-</script>
+    <script>
+    const cats=["すべて","部活","行事","落とし物","相談"];
+    let posts=[];
+    async function loadPosts(){
+    try{ const res=await fetch("/api/posts"); posts=await res.json(); }catch(err){ posts=[]; }
+    render();
+    }
+    let current="すべて";
+    const esc=s=>s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+    function render(){
+    const kw=document.getElementById("q").value.trim().toLowerCase();
+    const by=document.getElementById("sort").value;
+    const list=posts
+        .filter(p=>(current==="すべて"||p.c===current)&&(!kw||(p.t+" "+p.b+" "+p.n).toLowerCase().includes(kw)))
+        .sort((a,b)=>(b.extra?1:0)-(a.extra?1:0)||(by==="read"?b.r-a.r:(b.created||"").localeCompare(a.created||"")));
+    document.getElementById("board").innerHTML=list.length?list.map((p,i)=>`
+    <article class="slip${p.extra?" extra":""}">
+        ${p.ok?'<span class="stamp">確認済み</span>':''}
+        <span class="tag">${p.extra?"号外・":""}${esc(p.c)}</span>
+        <h2>${esc(p.t)}</h2><p>${esc(p.b)}</p>
+        <div class="meta"><span>${esc(p.n)}</span>
+        <button class="read" aria-pressed="false" data-i="${posts.indexOf(p)}">読んだ ${p.r}</button></div>
+    </article>`).join(""):"<p>該当するニュースがありません。条件を変えるか、最初の1本を投稿しよう。</p>";
+    }
+    document.getElementById("filters").innerHTML=cats.map(c=>`<button aria-pressed="${c===current}">${c}</button>`).join("");
+    document.getElementById("filters").addEventListener("click",e=>{
+    if(e.target.tagName!=="BUTTON")return;
+    current=e.target.textContent;
+    [...e.currentTarget.children].forEach(b=>b.setAttribute("aria-pressed",b.textContent===current));
+    render();
+    });
+    document.getElementById("board").addEventListener("click",async e=>{
+    const b=e.target.closest(".read");if(!b)return;
+    const p=posts[b.dataset.i],on=b.getAttribute("aria-pressed")==="true";
+    try{
+        const res=await fetch("/api/posts/"+p.id+"/read",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({delta:on?-1:1})});
+        if(!res.ok)return;
+        p.r=(await res.json()).r;
+    }catch(err){return;}
+    b.setAttribute("aria-pressed",String(!on));b.textContent="読んだ "+p.r;
+    });
+    document.getElementById("post").addEventListener("submit",async e=>{
+    e.preventDefault();
+    const msg=document.getElementById("msg");
+    try{
+        const res=await fetch("/api/posts",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({t:title.value,b:body.value,c:cat.value,n:nick.value})});
+        if(!res.ok)throw new Error();
+        posts.unshift(await res.json());
+    }catch(err){msg.textContent="投稿に失敗しました。もう一度お試しください。";return;}
+    e.target.reset();current="すべて";
+    [...document.getElementById("filters").children].forEach(b=>b.setAttribute("aria-pressed",b.textContent==="すべて"));
+    render();
+    document.getElementById("msg").textContent="投稿しました。新聞部が確認すると「確認済み」が付きます。";
+    });
+    document.getElementById("q").addEventListener("input",render);
+    document.getElementById("sort").addEventListener("change",render);
+    loadPosts();
+    </script>
 </body>
 </html>
