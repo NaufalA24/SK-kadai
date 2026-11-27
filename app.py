@@ -47,7 +47,6 @@ def all_posts(include_hidden=False):
 
 
 def is_admin():
-    # Admin disabled until ADMIN_PASSWORD is set in Azure.
     given = request.headers.get("X-Admin-Password", "")
     return bool(ADMIN_PASSWORD) and hmac.compare_digest(given.encode(), ADMIN_PASSWORD.encode())
 
