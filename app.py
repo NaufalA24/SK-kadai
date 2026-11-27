@@ -14,7 +14,7 @@ TABLE_NAME = "posts"
 PARTITION = "post"
 
 CONN = os.environ.get("STORAGE_CONNECTION_STRING")
-ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD")   # password for the journalism club admin page
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD")
 
 table = None
 if CONN:
