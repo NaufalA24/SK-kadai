@@ -67,6 +67,18 @@ form .submit{margin-top:16px;font:inherit;font-weight:700;background:var(--red);
 
 <script>
 const cats=["すべて","部活","行事","落とし物","相談"];
+/* FLASK TODO (1/3): LOAD POSTS
+   Right now posts live in this hardcoded array and are lost on reload.
+   With Flask: delete this sample data, start with `let posts=[];` and load from the server:
+     async function loadPosts(){
+       const res = await fetch("/api/posts");   // Flask route: GET /api/posts -> returns JSON list
+       posts = await res.json();
+       render();
+     }
+     loadPosts();   // call this instead of the plain render() at the bottom
+   Keep the same field names in the database/JSON:
+     t = title, b = body, c = category, n = nickname, ok = verified (確認済み), extra = 号外, r = read count
+   Also add an "id" field per post (Table Storage RowKey) so 読んだ and delete can target one post. */
 const posts=[
  {t:"文化祭の開催日が11月30日に決定",b:"体育館とクラス展示の両方で実施。クラスの出し物は今週金曜までに申請。",c:"行事",n:"新聞部",ok:true,extra:true,r:48},
  {t:"サッカー部、県大会ベスト8進出",b:"先週末の試合でPK戦を制した。次戦は来週土曜。",c:"部活",n:"サッカー部",ok:true,r:31},
@@ -96,11 +108,40 @@ document.getElementById("filters").addEventListener("click",e=>{
 document.getElementById("board").addEventListener("click",e=>{
   const b=e.target.closest(".read");if(!b)return;
   const p=posts[b.dataset.i],on=b.getAttribute("aria-pressed")==="true";
+  /* FLASK TODO (3/3): READ COUNT
+     This only changes the number in the browser. With Flask, tell the server too:
+       fetch("/api/posts/" + p.id + "/read", {method:"POST"});   // Flask route: POST /api/posts/<id>/read
+     then update p.r from the server's JSON response so every visitor sees the same count.
+     (To stop one person counting many times, remember it in localStorage on this device.) */
   p.r+=on?-1:1;b.setAttribute("aria-pressed",String(!on));b.textContent="読んだ "+p.r;
 });
-document.getElementById("post").addEventListener("submit",e=>{
+document.getElementById("post").addEventListener("submit",e=>{   /* FLASK TODO: make this callback "async" */
   e.preventDefault();
-  posts.unshift({t:title.value,b:body.value,c:cat.value,n:nick.value,ok:false,r:0});
+  /* ===== FLASK TODO (2/3): THE POST ACTION =====
+     Current behavior: build the post object in the browser and add it to the local array (no saving).
+
+     With Flask + database, replace the posts.unshift(...) line below with:
+
+       const newPost = {t:title.value, b:body.value, c:cat.value, n:nick.value};
+       const res = await fetch("/api/posts", {
+         method: "POST",
+         headers: {"Content-Type": "application/json"},
+         body: JSON.stringify(newPost)
+       });
+       if(!res.ok){ document.getElementById("msg").textContent="投稿に失敗しました。もう一度お試しください。"; return; }
+       const saved = await res.json();   // server returns the saved post incl. id, ok:false, r:0
+       posts.unshift(saved);
+
+     Flask side (app.py) should:
+       @app.post("/api/posts")  -> validate input (required, max length: title 30, body 100, nick 12),
+                                   escape/clean text, save a row to Table Storage
+                                   (PartitionKey = category, RowKey = unique id), return the row as JSON.
+       @app.get("/api/posts")   -> return all posts as JSON (newest first, 号外 first).
+     Image posting (optional): switch to FormData + an <input type="file">, upload to Blob Storage in Flask,
+     and store the image URL in the post row.
+     Do NOT put the Table Storage connection string or SAS token in this file or the repo (GitHub is Public).
+     Keep them in App Service "Application settings" and read them in Python with os.environ. */
+  posts.unshift({t:title.value,b:body.value,c:cat.value,n:nick.value,ok:false,r:0});   /* <- replace this line */
   e.target.reset();current="すべて";
   [...document.getElementById("filters").children].forEach(b=>b.setAttribute("aria-pressed",b.textContent==="すべて"));
   render();
