@@ -79,5 +79,5 @@
 | GitHubから自動公開 | GitHubにpushするとApp Serviceに自動で反映される | 発展 |
 | 画像の投稿と表示 | 投稿に画像を付け、Blob Storageから表示する | 未実装（今後の予定） |
 
-サイトのURL：（Azureで公開したURLを書く）
+サイトのURL：https://skkadai-b8bugxdqgnhgd3fe.eastasia-01.azurewebsites.net/
 GitHubリポジトリのURL：https://github.com/NaufalA24/SK-kadai
