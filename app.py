@@ -18,7 +18,6 @@ if CONN:
     service = TableServiceClient.from_connection_string(CONN)
     table = service.create_table_if_not_exists(TABLE_NAME)
  
-# Fallback so the site still loads without a database (posts vanish on restart).
 memory_posts = []
  
  
